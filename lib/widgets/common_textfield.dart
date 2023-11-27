@@ -8,8 +8,10 @@ class TextFieldWidget extends StatelessWidget {
   IconData? image;
   TextStyle hintStyle;
   bool obscureText;
-  FormFieldValidator validator;
+  FormFieldValidator? validator;
   TextEditingController textEditingController;
+  IconData? prefixIcon;
+  Function? onChange;
 
   TextFieldWidget({
     super.key,
@@ -18,55 +20,56 @@ class TextFieldWidget extends StatelessWidget {
     this.image,
     required this.hintStyle,
     this.labelStyle,
-    required this.validator,
+    this.validator,
     required this.obscureText,
     required this.textEditingController,
+    this.prefixIcon,
   });
 
   @override
   Widget build(BuildContext context) {
     return Material(
-      // Container(
-      //   margin: const EdgeInsets.only(bottom: 25),
-      //   padding: const EdgeInsets.only(left: 15, top: 5, bottom: 5),
-      //   // decoration: const BoxDecoration(
-      //   color: Colors.blue,
-      //   borderRadius: BorderRadius.all(Radius.circular(10)),
-      //   boxShadow: [
-      //     BoxShadow(
-      //       color: Color.fromARGB(255, 30, 136, 223),
-      //       offset: Offset(0, 4),
-      //       spreadRadius: 2,
-      //       blurRadius: 4,
-      //     ),
-      //   ],
-      // ),
-      color: Colors.blue,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.all(Radius.circular(10)),
-      ),
-      shadowColor: const Color.fromARGB(255, 30, 136, 223),
       elevation: 4,
-      
+      color: Colors.blue,
       child: TextFormField(
+        autovalidateMode: AutovalidateMode.onUserInteraction,
+        validator: validator,
+        cursorColor: Colors.white,
+        style: const TextStyle(fontSize: 16, color: Colors.white, height: 1.6),
+        obscureText: obscureText,
         controller: textEditingController,
-        style: const TextStyle(
-          color: Colors.white,
-        ),
         decoration: InputDecoration(
-          error: DecoratedBox(decoration: BoxDecoration()),
-          fillColor: Colors.blue,
-          filled: true,
-          border: InputBorder.none,
-          iconColor: Colors.white,
-          icon: Icon(image ?? Icons.abc),
+          errorBorder: const OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.red),
+          ),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 12.5,
+            vertical: 12.5,
+          ),
           hintText: hint,
-          hintStyle: const TextStyle(
-            color: Color.fromARGB(136, 255, 255, 255),
+          hintStyle: const TextStyle(color: Colors.white),
+          prefixIcon: Icon(prefixIcon, color: Colors.white),
+          focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: const BorderSide(
+                width: 0,
+                style: BorderStyle.none,
+              )),
+          filled: true,
+          fillColor: Colors.blue,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: const BorderSide(
+              width: 0,
+              style: BorderStyle.none,
+            ),
           ),
         ),
-        validator: validator,
-        obscureText: obscureText,
+        // onChanged: (value) {
+        //   if (onChange != null) {
+        //     onChange();
+        //   }
+        // },
       ),
     );
   }

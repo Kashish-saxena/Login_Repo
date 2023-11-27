@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_project/screens/input_validation.dart';
+import 'package:flutter_project/screens/home_screen.dart';
+import 'package:flutter_project/util/input_validation.dart';
+import 'package:flutter_project/util/string_constants.dart';
 import 'package:flutter_project/widgets/common_textfield.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -10,13 +12,32 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  bool? _changed = false; //isRememberMeClicked
+  @override
+  void initState() {
+    super.initState();
+    debugPrint("Initial State");
+  }
+
+  @override
+  void didChangeDependencies() {
+    debugPrint("Dependencies changed");
+    super.didChangeDependencies();
+  }
+
+  @override
+  void didUpdateWidget(covariant LoginScreen oldWidget) {
+    debugPrint("didUpdateWidget");
+    super.didUpdateWidget(oldWidget);
+  }
+
+  bool? isRememberMeClicked = false;
   final _formKey = GlobalKey<FormState>();
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   String _message = '';
-  final InputValidation _inputValidation = InputValidation();
-  
+  String emailMessage = 'aaaa';
+  String passwordMessage = '';
+  bool? isEmailValid = true;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -38,7 +59,7 @@ class _LoginScreenState extends State<LoginScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Text(
-                "Sign In",
+                StringConstants.signIn,
                 style: TextStyle(
                     color: Colors.white,
                     fontSize: 30,
@@ -71,13 +92,32 @@ class _LoginScreenState extends State<LoginScreen> {
                 hint: "Enter your Email",
                 label: "Email",
                 hintStyle: const TextStyle(color: Colors.white),
+                prefixIcon: Icons.email,
                 image: (Icons.email),
-                validator: (email) {
-                  if (!_inputValidation.isEmailValid(email)) {
-                    return "Email address should contain @";
-                  }
-                  return null;
-                },
+                // onChange: (val) {
+                //   if (!InputValidation.isEmailValid(val)) {
+                //     //setState(() {
+                //       isEmailValid = false;
+                //     //});
+                //   } else {
+                //     isEmailValid = true;
+                //   }
+                // },
+                // validator: (email) {
+                //   if (!InputValidation.isEmailValid(email)) {
+                //     return "Email address should contain @";
+                //   }
+                //   return null;
+                // },
+              ),
+              isEmailValid == false
+                  ? Text(
+                      emailMessage,
+                      style: const TextStyle(color: Colors.red),
+                    )
+                  : Container(),
+              SizedBox(
+                height: 20,
               ),
               const Align(
                 alignment: Alignment.topLeft,
@@ -94,14 +134,15 @@ class _LoginScreenState extends State<LoginScreen> {
                 obscureText: true,
                 hint: "Enter your Password",
                 label: "Password",
+                prefixIcon: Icons.lock,
                 hintStyle: const TextStyle(color: Colors.white),
                 image: (Icons.lock),
-                validator: (password) {
-                  if (!_inputValidation.isPasswordValid(password)) {
-                    return "Password is incorrect";
-                  }
-                  return null;
-                },
+                // validator: (password) {
+                //   if (!InputValidation.isPasswordValid(password)) {
+                //     return "Password is incorrect";
+                //   }
+                //   return null;
+                // },
               ),
               Align(
                 alignment: Alignment.topRight,
@@ -117,11 +158,11 @@ class _LoginScreenState extends State<LoginScreen> {
                 children: [
                   Checkbox(
                     side: const BorderSide(color: Colors.white, width: 2),
-                    value: _changed,
+                    value: isRememberMeClicked,
                     onChanged: (value) {
                       // print("value is $value");
                       setState(() {
-                        _changed = value;
+                        isRememberMeClicked = value;
                       });
                     },
                   ),
@@ -144,13 +185,28 @@ class _LoginScreenState extends State<LoginScreen> {
                         horizontal: 20, vertical: 10),
                   ),
                   onPressed: () {
-                    if (_formKey.currentState!.validate()) {
-                      var email = emailController.text;
-                      _message =
-                          "Your account with the email '$email' has been created.";
-                    } else {
-                      _message = "Please type correct email and password";
+                    // if (_formKey.currentState!.validate()) {
+                    print("here");
+                    if (emailController.text.toString().length == 0 &&
+                        passwordController.text.toString().length == 0) {
+                      setState(() {
+                        isEmailValid = false;
+                        print("isEmailValid is $isEmailValid");
+                      });
                     }
+                    //_message = "Please type correct email and password";
+                    //}
+                    //else {
+                    // print("not checking");
+                    // var email = emailController.text;
+                    // _message =
+                    //     "Your account with the email '$email' has been created.";
+                    // Navigator.push(
+                    //     context,
+                    //     MaterialPageRoute(
+                    //       builder: (context) => const HomeScreen(),
+                    //     ));
+                    // }
                   },
                   child: const Text(
                     "LOGIN",
@@ -224,6 +280,3 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 }
-
-
-
