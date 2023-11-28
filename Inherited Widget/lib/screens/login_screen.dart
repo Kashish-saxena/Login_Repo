@@ -1,14 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_project/screens/home_screen.dart';
+import 'package:flutter_project/util/color_constants.dart';
 import 'package:flutter_project/util/input_validation.dart';
 import 'package:flutter_project/util/string_constants.dart';
 import 'package:flutter_project/widgets/common_textfield.dart';
+import 'package:flutter_project/widgets/inherited_widget.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+  final String? data;
+  const LoginScreen({super.key, required this.data});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<LoginScreen> createState() {
+    debugPrint(data); //to check when the create state works.
+    return _LoginScreenState();
+  }
 }
 
 class _LoginScreenState extends State<LoginScreen> {
@@ -28,24 +34,40 @@ class _LoginScreenState extends State<LoginScreen> {
   void didUpdateWidget(covariant LoginScreen oldWidget) {
     debugPrint("didUpdateWidget");
     super.didUpdateWidget(oldWidget);
+
+    if (widget.data == oldWidget.data) {
+      debugPrint("didUpdateWidget");
+    }
   }
 
   bool? isRememberMeClicked = false;
   final _formKey = GlobalKey<FormState>();
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
-  String _message = '';
-  String emailMessage = 'aaaa';
-  String passwordMessage = '';
+
+  String emailMessage = 'Please enter your Email';
+  String passwordMessage = 'Please enter your Password';
   bool? isEmailValid = true;
+  bool? isPasswordValid = true;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: buildBody(),
+      // body: buildBody(),
+      body: MyInheritedWidget(
+        message: "Kashish",
+        child: Builder(builder: (BuildContext innercontext) {
+          context = innercontext;
+          return buildBody(context);
+
+          // Center(
+          //   child: Text(MyInheritedWidget.of(innercontext).message),
+          // );
+        }),
+      ),
     );
   }
 
-  Widget buildBody() {
+  Widget buildBody(BuildContext newContext) {
     return SingleChildScrollView(
       child: Container(
         margin: const EdgeInsets.only(
@@ -58,6 +80,13 @@ class _LoginScreenState extends State<LoginScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              Text(
+                MyInheritedWidget.of(newContext).message,
+                style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 30,
+                    fontWeight: FontWeight.bold),
+              ),
               const Text(
                 StringConstants.signIn,
                 style: TextStyle(
@@ -68,13 +97,13 @@ class _LoginScreenState extends State<LoginScreen> {
               const SizedBox(
                 height: 40,
               ),
-              Text(
-                _message,
-                style: const TextStyle(
-                  color: Colors.red,
-                  fontSize: 16,
-                ),
-              ),
+              // Text(
+              //   _message,
+              //   style: const TextStyle(
+              //     color: Colors.red,
+              //     fontSize: 16,
+              //   ),
+              // ),
               const Align(
                 alignment: Alignment.topLeft,
                 child: Text(
@@ -90,19 +119,29 @@ class _LoginScreenState extends State<LoginScreen> {
                 textEditingController: emailController,
                 obscureText: false,
                 hint: "Enter your Email",
-                label: "Email",
+                label: StringConstants.email,
                 hintStyle: const TextStyle(color: Colors.white),
                 prefixIcon: Icons.email,
                 image: (Icons.email),
-                // onChange: (val) {
-                //   if (!InputValidation.isEmailValid(val)) {
-                //     //setState(() {
-                //       isEmailValid = false;
-                //     //});
-                //   } else {
-                //     isEmailValid = true;
-                //   }
-                // },
+                errorColor: isEmailValid == true
+                    ? ColorConstants.whiteColor
+                    : ColorConstants.amberColor,
+                enabledColor: isEmailValid == true
+                    ? ColorConstants.whiteColor
+                    : ColorConstants.amberColor,
+                onChange: (val) {
+                  if (!InputValidation.isEmailValid(val)) {
+                    setState(() {
+                      isEmailValid = false;
+                      debugPrint("isEmailValid in if is $isEmailValid");
+                    });
+                  } else {
+                    setState(() {
+                      isEmailValid = true;
+                      debugPrint("isEmailValid in else is $isEmailValid");
+                    });
+                  }
+                },
                 // validator: (email) {
                 //   if (!InputValidation.isEmailValid(email)) {
                 //     return "Email address should contain @";
@@ -110,19 +149,25 @@ class _LoginScreenState extends State<LoginScreen> {
                 //   return null;
                 // },
               ),
+              const SizedBox(
+                height: 10,
+              ),
               isEmailValid == false
-                  ? Text(
-                      emailMessage,
-                      style: const TextStyle(color: Colors.red),
+                  ? Align(
+                      alignment: Alignment.topLeft,
+                      child: Text(
+                        emailMessage,
+                        style: const TextStyle(color: Colors.amber),
+                      ),
                     )
                   : Container(),
-              SizedBox(
+              const SizedBox(
                 height: 20,
               ),
               const Align(
                 alignment: Alignment.topLeft,
                 child: Text(
-                  "Password",
+                  StringConstants.password,
                   style: TextStyle(
                       color: Colors.white,
                       fontSize: 16,
@@ -133,24 +178,49 @@ class _LoginScreenState extends State<LoginScreen> {
                 textEditingController: passwordController,
                 obscureText: true,
                 hint: "Enter your Password",
-                label: "Password",
+                label: StringConstants.password,
                 prefixIcon: Icons.lock,
                 hintStyle: const TextStyle(color: Colors.white),
                 image: (Icons.lock),
-                
-                // validator: (password) {
-                //   if (!InputValidation.isPasswordValid(password)) {
-                //     return "Password is incorrect";
-                //   }
-                //   return null;
-                // },
+                enabledColor: isPasswordValid == true
+                    ? ColorConstants.whiteColor
+                    : ColorConstants.amberColor,
+                errorColor: isPasswordValid == true
+                    ? ColorConstants.whiteColor
+                    : ColorConstants.amberColor,
+                onChange: (val) {
+                  if (!InputValidation.isPasswordValid(val)) {
+                    setState(() {
+                      isPasswordValid = false;
+                      debugPrint("isPAsswordValid in if is $isPasswordValid");
+                    });
+                  } else {
+                    setState(() {
+                      isPasswordValid = true;
+                      debugPrint(
+                          "isPasssowrdValid in else is $isPasswordValid");
+                    });
+                  }
+                },
               ),
+              const SizedBox(
+                height: 10,
+              ),
+              isPasswordValid == false
+                  ? Align(
+                      alignment: Alignment.topLeft,
+                      child: Text(
+                        passwordMessage,
+                        style: const TextStyle(color: Colors.amber),
+                      ),
+                    )
+                  : Container(),
               Align(
                 alignment: Alignment.topRight,
                 child: TextButton(
                   onPressed: () {},
                   child: const Text(
-                    "Forgot Password?",
+                    StringConstants.forgotPassword,
                     style: TextStyle(color: Colors.white, fontSize: 16),
                   ),
                 ),
@@ -168,7 +238,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     },
                   ),
                   const Text(
-                    "Remember me",
+                    StringConstants.rememberMe,
                     style: TextStyle(
                         color: Colors.white,
                         fontSize: 16,
@@ -177,7 +247,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ],
               ),
               SizedBox(
-                width: MediaQuery.of(context).size.width,
+                width: MediaQuery.of(newContext).size.width,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     elevation: 6,
@@ -187,14 +257,25 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   onPressed: () {
                     // if (_formKey.currentState!.validate()) {
-                    // print("here");
-                    // if (emailController.text.toString().length == 0 &&
-                    //     passwordController.text.toString().length == 0) {
-                    //   setState(() {
-                    //     isEmailValid = false;
-                    //     print("isEmailValid is $isEmailValid");
-                    //   });
-                    },
+                    print("here");
+                    if (emailController.text.toString().isEmpty) {
+                      setState(() {
+                        isEmailValid = false;
+                        print("isEmailValid is $isEmailValid");
+                      });
+                    } else if (passwordController.text.toString().isEmpty) {
+                      setState(() {
+                        isPasswordValid = false;
+                        print("isPasswordValid is $isPasswordValid");
+                      });
+                    } else if (isEmailValid == true &&
+                        isPasswordValid == true) {
+                      Navigator.push(
+                          newContext,
+                          MaterialPageRoute(
+                            builder: (newContext) => const HomeScreen(),
+                          ));
+                    }
                     //_message = "Please type correct email and password";
                     //}
                     //else {
@@ -202,15 +283,11 @@ class _LoginScreenState extends State<LoginScreen> {
                     // var email = emailController.text;
                     // _message =
                     //     "Your account with the email '$email' has been created.";
-                    // Navigator.push(
-                    //     context,
-                    //     MaterialPageRoute(
-                    //       builder: (context) => const HomeScreen(),
-                    //     ));
+
                     // }
-                  
+                  },
                   child: const Text(
-                    "LOGIN",
+                    StringConstants.login,
                     style: TextStyle(
                       fontSize: 18,
                       color: Color.fromARGB(255, 17, 98, 163),
@@ -222,14 +299,14 @@ class _LoginScreenState extends State<LoginScreen> {
                 height: 20,
               ),
               const Text(
-                "- OR -",
+                StringConstants.or,
                 style: TextStyle(fontSize: 16, color: Colors.white),
               ),
               const SizedBox(
                 height: 20,
               ),
               const Text(
-                "Sign in with",
+                StringConstants.signInWith,
                 style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -252,7 +329,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const Text(
-                    "Don't have an Account ? ",
+                    StringConstants.account,
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 16,
@@ -264,7 +341,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     onPressed: null,
                     child: const Text(
-                      "Sign Up",
+                      StringConstants.signUp,
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
